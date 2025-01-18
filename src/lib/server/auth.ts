@@ -130,11 +130,23 @@ export async function getOIDCUserData(
 	settings: OIDCSettings,
 	code: string,
 	iss?: string
-): Promise<OIDCUserInfo> {
+): Promise<OIDCUserInfo | null> {
 	const client = await getOIDCClient(settings);
 	const token = await client.callback(settings.redirectURI, { code, iss });
 	const userData = await client.userinfo(token);
 
+	// Get the allowed emails from environment variables
+	const allowedEmails = (env.OPENID_ALLOWED_EMAILS || "").split(",");
+	console.log(userData);
+
+	// Check if the user's email is in the allowed list
+	if (!allowedEmails.includes(userData.email)) {
+		// If not, reject the login
+		logger.error(`Login attempt from disallowed email: ${userData.email}`);
+		return null;
+	}
+
+	// If the email is allowed, return the OIDC user data
 	return { token, userData };
 }
 

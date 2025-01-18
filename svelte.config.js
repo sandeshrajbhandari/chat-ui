@@ -1,4 +1,5 @@
-import adapter from "@sveltejs/adapter-node";
+// import adapter from "@sveltejs/adapter-node";
+import adapter from "@sveltejs/adapter-vercel";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import dotenv from "dotenv";
 import { execSync } from "child_process";
@@ -25,7 +26,9 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({
+			split: true,
+		}),
 
 		paths: {
 			base: process.env.APP_BASE || "",
